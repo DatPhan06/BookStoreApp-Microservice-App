@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { BACKEND_API_GATEWAY_URL } from '../constants/appConstants';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row, Image } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { createProductAction } from '../actions/productActions';
-import FormContainer from '../components/FormContainer';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { uploadImageApi, getProductCategories } from '../service/RestApiCalls';
@@ -87,16 +86,22 @@ const ProductCreateScreen = ({ match, history }) => {
             <Col md={4}>
               <Row>
                 <Form.Group controlId='image'>
-                  <img
+                  <Image
                     src={`${BACKEND_API_GATEWAY_URL}/api/catalog/image/${image}`}
                     alt={image}
                     style={{ height: '400px' }}
                     fluid
                     rounded
-                  ></img>
+                  />
                   {uploading && <Loader />}
                 </Form.Group>
-                <Form.File className='mt-5 mr-4' id='image-file' label='Choose File' custom onChange={uploadFileHandler}></Form.File>
+                <Form.Control 
+                  type="file"
+                  className='mt-5 mr-4'
+                  id='image-file'
+                  label='Choose File'
+                  onChange={uploadFileHandler}
+                />
               </Row>
             </Col>
             <Col>

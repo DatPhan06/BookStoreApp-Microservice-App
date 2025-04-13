@@ -161,20 +161,52 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     private String createPaymentMethodAtStripe(CreatePaymentMethodRequest createPaymentMethodRequest) {
+        // Validate card number
+        String cardNumber = createPaymentMethodRequest.getCard().getCardNumber().replaceAll("\\s+", "");
+        if (cardNumber.length() < 13 || cardNumber.length() > 19) {
+            throw new RunTimeExceptionPlaceHolder("Invalid card number length");
+        }
+
+        // Validate expiration date
+        int expMonth = createPaymentMethodRequest.getCard().getExpirationMonth();
+        if (expMonth < 1 || expMonth > 12) {
+            throw new RunTimeExceptionPlaceHolder("Invalid expiration month");
+        }
+
+        int expYear = createPaymentMethodRequest.getCard().getExpirationYear();
+        if (expYear < 100) {
+            // Convert 2-digit year to 4-digit year
+            int currentYear = java.time.Year.now().getValue() % 100;
+            int currentCentury = java.time.Year.now().getValue() / 100 * 100;
+            expYear = expYear <= currentYear ? currentCentury + expYear : (currentCentury - 100) + expYear;
+        }
+
+        // Check if card is expired
+        int currentYear = java.time.Year.now().getValue();
+        int currentMonth = java.time.MonthDay.now().getMonthValue();
+        
+        if (expYear < currentYear || (expYear == currentYear && expMonth < currentMonth)) {
+            throw new RunTimeExceptionPlaceHolder("Card has expired. Please enter a valid expiration date.");
+        }
+
         Map<String, Object> card = new HashMap<>();
-        card.put("number", createPaymentMethodRequest.getCard().getCardNumber());
-        card.put("exp_month", createPaymentMethodRequest.getCard().getExpirationMonth());
-        card.put("exp_year", createPaymentMethodRequest.getCard().getExpirationYear());
+        card.put("number", cardNumber);
+        card.put("exp_month", expMonth);
+        card.put("exp_year", expYear);
         card.put("cvc", createPaymentMethodRequest.getCard().getCvv());
+        
         Map<String, Object> params = new HashMap<>();
         params.put("type", "card");
         params.put("card", card);
 
         try {
+            log.info("Creating payment method with params: {}", params);
             PaymentMethod paymentMethod = PaymentMethod.create(params);
+            log.info("Successfully created payment method: {}", paymentMethod.getId());
             return paymentMethod.getId();
         } catch (StripeException e) {
-            throw new RunTimeExceptionPlaceHolder("Error while setting up payment method.");
+            log.error("Stripe error while creating payment method: {}", e.getMessage());
+            throw new RunTimeExceptionPlaceHolder("Error while setting up payment method: " + e.getMessage());
         }
     }
 
