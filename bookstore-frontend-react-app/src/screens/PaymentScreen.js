@@ -40,14 +40,41 @@ const PaymentScreen = ({ history }) => {
   };
 
   const saveCard = () => {
+    // Validate card number format (remove spaces)
+    const cleanCardNumber = cardNumber.replace(/\s/g, '');
+    if (cleanCardNumber.length !== 16) {
+      setMessage('Invalid card number. Please enter 16 digits.');
+      return;
+    }
+
+    // Validate expiration month
+    if (parseInt(expirationMonth) < 1 || parseInt(expirationMonth) > 12) {
+      setMessage('Invalid expiration month. Please enter a value between 1 and 12.');
+      return;
+    }
+
+    // Validate expiration year
+    const currentYear = new Date().getFullYear() % 100;
+    if (parseInt(expirationYear) < currentYear) {
+      setMessage('Card has expired. Please enter a valid expiration year.');
+      return;
+    }
+
+    // Validate CVV
+    if (cvv.length < 3 || cvv.length > 4) {
+      setMessage('Invalid CVV. Please enter 3 or 4 digits.');
+      return;
+    }
+
     const cardRequestBody = {
       card: {
-        cardNumber: cardNumber,
-        expirationMonth: expirationMonth,
-        expirationYear: expirationYear,
+        cardNumber: cleanCardNumber,
+        expirationMonth: parseInt(expirationMonth),
+        expirationYear: parseInt(expirationYear),
         cvv: cvv
       }
     };
+
     dispatch(savePaymentMethodAction(cardRequestBody));
   };
 

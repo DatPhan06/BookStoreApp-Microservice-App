@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import FullPageLoader from '../components/FullPageLoader';
 import { createProductReviewAction, listProductDetailsAction, listProductReviewsAction, getImageAction } from '../actions/productActions';
+import { addToCartAction } from '../actions/cartActions';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import Rating from '../components/Rating';
@@ -45,7 +46,11 @@ const ProductScreen = (props) => {
   }, [dispatch, product?.imageId]);
 
   const addToCartHandler = () => {
-    props.history.push(`/cart/${props.match.params.id}?qty=${qty}`);
+    dispatch(addToCartAction({
+      productId: props.match.params.id,
+      quantity: qty
+    }));
+    props.history.push('/cart');
   };
 
   const createProductReviewHandler = (e) => {

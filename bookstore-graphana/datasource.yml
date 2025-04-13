@@ -84,14 +84,21 @@ datasources:
   # <string, required> datasource type. Required
   type: prometheus
   # <string, required> access mode. proxy or direct (Server or Browser in the UI). Required
-  access: direct
+  access: proxy
   # <int> org id. will default to orgId 1 if not specified
   orgId: 1
   # <string> url
-  url: http://localhost:9090
+  url: http://bookstore-prometheus:9090
   # <map> fields that will be converted to json and stored in jsonData
   jsonData:
     httpMethod: GET
+    timeInterval: 15s
+    queryTimeout: 60s
+    cacheLevel: Low
+    prometheusType: Prometheus
+    disableMetricsLookup: false
+    incrementalQuerying: false
+    disableRecordingRules: false
   # <string> json object of data that will be encrypted.
   version: 1
   # <bool> allow users to edit datasources from the UI.

@@ -203,16 +203,27 @@ services:
       - booksture-influxdb-volume:/var/lib/influxdb
     ports:
       - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: 12345678
+      DOCKER_INFLUXDB_INIT_ORG: bookstore
+      DOCKER_INFLUXDB_INIT_BUCKET: telegraf
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: BT2PIaHO3q9CyBZ7AT5yB1F_Vd-XqZVIx9J3zVAyHClvc0crtLUHviiUncoH97QnIaZi2ytMwTdtIG7uzeg-pA==
     networks:
       - bookstore-app-network
 
   bookstore-chronograf:
-    image: chronograf:1.7.3
+    image: chronograf:1.9.4
     container_name: bookstore-chronograf
     hostname: bookstore-chronograf
     environment:
       INFLUXDB_URL: http://bookstore-influxdb:8086
       KAPACITOR_URL: http://bookstore-kapacitor:9092
+      INFLUXDB_USERNAME: admin
+      INFLUXDB_PASSWORD: 12345678
+      INFLUXDB_ORG: bookstore
+      INFLUXDB_TOKEN: BT2PIaHO3q9CyBZ7AT5yB1F_Vd-XqZVIx9J3zVAyHClvc0crtLUHviiUncoH97QnIaZi2ytMwTdtIG7uzeg-pA==
     volumes:
       - booksture-chronograf-volume:/var/lib/chronograf
     ports:
@@ -222,12 +233,16 @@ services:
       - bookstore-app-network
 
   bookstore-kapacitor:
-    image: kapacitor:1.6.5
+    image: kapacitor:1.6.6
     container_name: bookstore-kapacitor
     hostname: bookstore-kapacitor
     environment:
       KAPACITOR_HOSTNAME: bookstore-kapacitor
       KAPACITOR_INFLUXDB_0_URLS_0: http://bookstore-influxdb:8086
+      KAPACITOR_INFLUXDB_0_USERNAME: admin
+      KAPACITOR_INFLUXDB_0_PASSWORD: 12345678
+      KAPACITOR_INFLUXDB_0_ORG: bookstore
+      KAPACITOR_INFLUXDB_0_TOKEN: BT2PIaHO3q9CyBZ7AT5yB1F_Vd-XqZVIx9J3zVAyHClvc0crtLUHviiUncoH97QnIaZi2ytMwTdtIG7uzeg-pA==
     ports:
       - "9092:9092"
     networks:
