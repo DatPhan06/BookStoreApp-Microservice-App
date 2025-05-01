@@ -205,3 +205,22 @@ password: 'cores.devd123'
 ```curl 93ed453e-b7ac-4192-a6d4-c45fae0d99ac:client.devd123@localhost:4001/oauth/token -d grant_type=password -d username=admin.admin -d password=admin.devd123```
 
 <hr>
+
+
+kubectl delete all --all -n bookstore
+
+MySQL: 30001
+Consul: 30002
+Zuul Gateway: 30003
+Account Service: 30004
+Billing Service: 30005
+Catalog Service: 30006
+Order Service: 30007
+Payment Service: 30008
+Zipkin: 30009
+Prometheus: 30010
+Grafana: 30011
+InfluxDB: 30012
+Telegraf: 30013 (UDP)
+Chronograf: 30014
+Kapacitor: 30015
