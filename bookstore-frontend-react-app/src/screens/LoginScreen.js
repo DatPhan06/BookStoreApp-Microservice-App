@@ -1,69 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import Message from '../components/Message';
+import { useHistory, Link } from 'react-router-dom';
 import { login } from '../actions/userActions';
-import FormContainer from '../components/FormContainer';
+import Message from '../components/Message';
 import FullPageLoader from '../components/FullPageLoader';
 
-const LoginScreen = (props) => {
-  const [userNameOrEmail, setUserNameOrEmail] = useState('');
-  const [password, setPassword] = useState('');
+const LoginScreen = ({ location }) => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const userLogin = useSelector((state) => state.userLogin);
   const { loading, error, userInfo } = userLogin;
 
-  const redirect = props.location.search ? props.location.search.substring(props.location.search.indexOf('=') + 1) : '/';
+  const redirect = location.search
+    ? new URLSearchParams(location.search).get('redirect') || '/'
+    : '/';
 
   useEffect(() => {
-    if (userInfo) {
-      props.history.push(redirect);
-    }
-  }, [props.history, userInfo, redirect]);
+    console.log('LoginScreen useEffect triggered. userInfo:', userInfo, 'redirect:', redirect);
 
-  const loginSubmitHandler = (e) => {
-    e.preventDefault();
-    dispatch(login(userNameOrEmail, password));
+    if (userInfo) {
+      console.log('User logged in. Redirecting to:', redirect);
+      history.push(redirect);
+      return;
+    }
+
+    const handleMessage = (event) => {
+      console.log('LoginScreen received message:', event);
+      if (event.origin !== 'http://localhost:5678') {
+        console.log('Invalid origin:', event.origin);
+        return;
+      }
+
+      const { type, data } = event.data;
+      console.log('Message data:', { type, data });
+
+      if (type === 'login' && data.userNameOrEmail && data.password) {
+        console.log('Dispatching login with:', data);
+        dispatch(login(data.userNameOrEmail, data.password));
+      } else {
+        console.error('Invalid login message data:', { type, data });
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => {
+      console.log('Removing LoginScreen message event listener');
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [history, userInfo, redirect, dispatch]);
+
+  const handleLoginClick = () => {
+    console.log('Login button clicked. Opening localhost:3001/login');
+    window.open('http://localhost:5678/login', '_blank');
   };
 
   return (
-    <div>
-      <FormContainer>
-        <h1>Sign In</h1>
-        {error && <Message variant='danger'>{JSON.stringify(error)}</Message>}
-        <Form onSubmit={loginSubmitHandler}>
-          <Form.Group controlId='userNameOrEmail'>
-            <Form.Label>Email Address</Form.Label>
-            <Form.Control
-              placeholder='Username or Email'
-              value={userNameOrEmail}
-              onChange={(e) => setUserNameOrEmail(e.target.value)}
-            ></Form.Control>
-          </Form.Group>
-
-          <Form.Group controlId='password'>
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              placeholder='Password'
-              type='password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            ></Form.Control>
-          </Form.Group>
-
-          <Button type='submit' variant='primary'>
-            Sign In
-          </Button>
-        </Form>
-
-        <Row className='py-3'>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div style={{ textAlign: 'center', padding: '20px' }}>
+        {error && (
+          <Message variant="danger" style={{ marginBottom: '15px' }}>
+            {error.message || JSON.stringify(error)}
+          </Message>
+        )}
+        <Button
+          variant="primary"
+          onClick={handleLoginClick}
+          style={{ width: '150px', marginBottom: '15px' }}
+        >
+          Login
+        </Button>
+        <Row className="py-3">
           <Col>
-            New Customer? <Link to={redirect ? `/register?redirect=${redirect}` : '/register'}>Register</Link>
+            Don't have an account?{' '}
+            <Link to={redirect ? `/register?redirect=${redirect}` : '/register'}>Register</Link>
           </Col>
         </Row>
-      </FormContainer>
-      {loading && <FullPageLoader></FullPageLoader>}
+        {loading && <FullPageLoader />}
+      </div>
     </div>
   );
 };
