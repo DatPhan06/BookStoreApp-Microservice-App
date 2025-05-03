@@ -37,22 +37,27 @@ spec:
     spec:
       containers:
       - name: influxdb
-        image: influxdb:2.7.1
+        image: influxdb:1.8.10
         ports:
         - containerPort: 8086
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
         env:
-        - name: DOCKER_INFLUXDB_INIT_MODE
-          value: "setup"
-        - name: DOCKER_INFLUXDB_INIT_USERNAME
-          value: "admin"
-        - name: DOCKER_INFLUXDB_INIT_PASSWORD
-          value: "12345678"
-        - name: DOCKER_INFLUXDB_INIT_ORG
-          value: "bookstore"
-        - name: DOCKER_INFLUXDB_INIT_BUCKET
+        - name: INFLUXDB_DB
           value: "telegraf"
-        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
-          value: "BT2PIaHO3q9CyBZ7AT5yB1F_Vd-XqZVIx9J3zVAyHClvc0crtLUHviiUncoH97QnIaZi2ytMwTdtIG7uzeg-pA=="
+        - name: INFLUXDB_USER
+          value: "admin"
+        - name: INFLUXDB_USER_PASSWORD
+          value: "12345678"
+        - name: INFLUXDB_ADMIN_USER
+          value: "admin"
+        - name: INFLUXDB_ADMIN_PASSWORD
+          value: "12345678"
         volumeMounts:
         - name: influxdb-storage
           mountPath: /var/lib/influxdb
@@ -92,10 +97,17 @@ spec:
     spec:
       containers:
       - name: telegraf
-        image: bookstore-telegraf
+        image: datfan06/bookstore-telegraf:latest
         ports:
         - containerPort: 8125
           protocol: UDP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 150m
+            memory: 128Mi
         env:
         - name: HOSTNAME
           value: "bookstore-telegraf"
@@ -154,6 +166,13 @@ spec:
         image: chronograf:1.9.4
         ports:
         - containerPort: 8888
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 150m
+            memory: 256Mi
         env:
         - name: INFLUXDB_URL
           value: "http://bookstore-influxdb:8086"
@@ -209,6 +228,13 @@ spec:
         image: kapacitor:1.6.6
         ports:
         - containerPort: 9092
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 150m
+            memory: 256Mi
         env:
         - name: KAPACITOR_HOSTNAME
           value: "bookstore-kapacitor"

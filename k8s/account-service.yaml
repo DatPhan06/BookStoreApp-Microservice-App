@@ -16,6 +16,13 @@ spec:
       containers:
       - name: account
         image: datfan06/bookstore-account-service:latest
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
         ports:
         - containerPort: 4001
         env:

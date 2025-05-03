@@ -29,7 +29,14 @@ spec:
     spec:
       containers:
       - name: prometheus
-        image: bookstore-prometheus
+        image: datfan06/bookstore-prometheus:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
         ports:
         - containerPort: 9090
         volumeMounts:

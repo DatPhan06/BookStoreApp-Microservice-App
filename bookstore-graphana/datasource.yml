@@ -22,7 +22,7 @@ datasources:
   # <int> org id. will default to orgId 1 if not specified
   orgId: 1
   # <string> url
-  url: http://localhost:8086
+  url: http://bookstore-influxdb:8086
   # <string> Deprecated, use secureJsonData.password
   password:
   # <string> database user, if used
@@ -44,7 +44,7 @@ datasources:
   # <int> org id. will default to orgId 1 if not specified
   orgId: 1
   # <string> url
-  url: http://localhost:8086
+  url: http://bookstore-influxdb:8086
   # <string> Deprecated, use secureJsonData.password
   password:
   # <string> database user, if used
@@ -66,7 +66,7 @@ datasources:
   # <int> org id. will default to orgId 1 if not specified
   orgId: 1
   # <string> url
-  url: http://localhost:8086
+  url: http://bookstore-influxdb:8086
   # <string> Deprecated, use secureJsonData.password
   password:
   # <string> database user, if used

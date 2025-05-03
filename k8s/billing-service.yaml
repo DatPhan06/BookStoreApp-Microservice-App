@@ -16,6 +16,13 @@ spec:
       containers:
       - name: billing
         image: datfan06/bookstore-billing-service:latest
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+          limits:
+            memory: "2Gi"
+            cpu: "300m"
         ports:
         - containerPort: 5001
         env:

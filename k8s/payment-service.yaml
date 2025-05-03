@@ -16,6 +16,13 @@ spec:
       containers:
       - name: payment
         image: datfan06/bookstore-payment-service:latest
+        resources:
+          requests:
+            memory: "768Mi"
+            cpu: "100m"
+          limits:
+            memory: "1536Mi"
+            cpu: "300m"
         ports:
         - containerPort: 8001
         env:

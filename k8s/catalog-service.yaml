@@ -16,6 +16,13 @@ spec:
       containers:
       - name: catalog
         image: datfan06/bookstore-catalog-service:latest
+        resources:
+          requests:
+            memory: "1.5Gi"
+            cpu: "300m"
+          limits:
+            memory: "3Gi"
+            cpu: "500m"
         ports:
         - containerPort: 6001
         env:

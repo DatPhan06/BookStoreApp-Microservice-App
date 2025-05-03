@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul-service-registration-fix
+  namespace: bookstore
+data:
+  application-docker.yml: |
+    spring:
+      cloud:
+        consul:

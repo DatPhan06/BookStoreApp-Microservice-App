@@ -16,6 +16,13 @@ spec:
       containers:
       - name: zuul
         image: datfan06/bookstore-api-gateway-service:latest
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
         ports:
         - containerPort: 8765
         env:

@@ -25,18 +25,48 @@ spec:
       labels:
         app: bookstore-grafana
     spec:
+      initContainers:
+      - name: init-dashboards-dir
+        image: busybox
+        command: ['sh', '-c', 'mkdir -p /var/lib/grafana/dashboards && chmod -R 777 /var/lib/grafana/']
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
       containers:
       - name: grafana
-        image: graphana
+        image: datfan06/graphana:latest
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 150m
+            memory: 256Mi
         ports:
         - containerPort: 3000
         volumeMounts:
         - name: grafana-storage
           mountPath: /var/lib/grafana
+        - name: dashboard-config
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: datasource-config
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: dashboard-sample
+          mountPath: /var/lib/grafana/dashboards/sample.json
+          subPath: dashboard.json
       volumes:
       - name: grafana-storage
         persistentVolumeClaim:
           claimName: grafana-pvc
+      - name: dashboard-config
+        configMap:
+          name: grafana-dashboard-config
+      - name: datasource-config
+        configMap:
+          name: grafana-datasource-config
+      - name: dashboard-sample
+        configMap:
+          name: grafana-dashboard-sample
 ---
 apiVersion: v1
 kind: Service
