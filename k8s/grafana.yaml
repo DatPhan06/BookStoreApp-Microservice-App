@@ -51,9 +51,6 @@ spec:
           mountPath: /etc/grafana/provisioning/dashboards
         - name: datasource-config
           mountPath: /etc/grafana/provisioning/datasources
-        - name: dashboard-sample
-          mountPath: /var/lib/grafana/dashboards/sample.json
-          subPath: dashboard.json
       volumes:
       - name: grafana-storage
         persistentVolumeClaim:
@@ -64,9 +61,7 @@ spec:
       - name: datasource-config
         configMap:
           name: grafana-datasource-config
-      - name: dashboard-sample
-        configMap:
-          name: grafana-dashboard-sample
+
 ---
 apiVersion: v1
 kind: Service
