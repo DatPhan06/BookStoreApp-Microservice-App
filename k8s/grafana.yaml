@@ -26,9 +26,18 @@ spec:
         app: bookstore-grafana
     spec:
       initContainers:
-      - name: init-dashboards-dir
-        image: busybox
-        command: ['sh', '-c', 'mkdir -p /var/lib/grafana/dashboards && chmod -R 777 /var/lib/grafana/']
+      - name: init-copy-dashboards
+        image: datfan06/graphana:latest
+        command: ['sh', '-c']
+        args:
+          - |
+            echo "Creating dashboards directory..."
+            mkdir -p /var/lib/grafana/dashboards
+            echo "Copying dashboards from /tmp/dashboards-source..."
+            cp /tmp/dashboards-source/*.json /var/lib/grafana/dashboards/ || echo "No dashboards found in /tmp/dashboards-source or copy failed"
+            echo "Setting permissions..."
+            chmod -R 777 /var/lib/grafana/
+            echo "Init container finished."
         volumeMounts:
         - name: grafana-storage
           mountPath: /var/lib/grafana
