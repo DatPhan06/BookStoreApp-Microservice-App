@@ -45,6 +45,15 @@ spring:
       port: 8500
       discovery:
         instanceId: ${spring.application.name}:${random.value}
+        prefer-ip-address: true
+        hostname-as-instance-id: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        health-check-critical-timeout: 20s
+        service-name: bookstore-api-gateway-service
+        scheme: http
+        register-health-check: true
+        tags: secure=false
       enabled: true #consul discovery is enabled in this profile
 
 management:

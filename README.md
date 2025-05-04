@@ -205,3 +205,53 @@ password: 'cores.devd123'
 ```curl 93ed453e-b7ac-4192-a6d4-c45fae0d99ac:client.devd123@localhost:4001/oauth/token -d grant_type=password -d username=admin.admin -d password=admin.devd123```
 
 <hr>
+
+
+kubectl delete all --all -n bookstore
+
+MySQL: 30001
+Consul: 30002
+Zuul Gateway: 30003
+Account Service: 30004
+Billing Service: 30005
+Catalog Service: 30006
+Order Service: 30007
+Payment Service: 30008
+Zipkin: 30009
+Prometheus: 30010
+Grafana: 30011
+InfluxDB: 30012
+Telegraf: 30013 (UDP)
+Chronograf: 30014
+Kapacitor: 30015
+
+minikube start --memory=6g --cpus=4
+
+chmod +x build_and_push.sh && ./build_and_push.sh docker-hub
+
+kubectl get pods -n bookstore
+
+dat@instance-20250411-160829:~/Workspace/test/BookStoreApp-Distributed-Application$ minikube service list
+ -n bookstore
+|-----------|-----------------------------------|-------------|---------------------------|
+| NAMESPACE |               NAME                | TARGET PORT |            URL            |
+|-----------|-----------------------------------|-------------|---------------------------|
+| bookstore | bookstore-account-service         |        4001 | http://192.168.49.2:30004 |
+| bookstore | bookstore-billing-service         |        5001 | http://192.168.49.2:30005 |
+| bookstore | bookstore-catalog-service         |        6001 | http://192.168.49.2:30006 |
+| bookstore | bookstore-chronograf              |        8888 | http://192.168.49.2:30014 |
+| bookstore | bookstore-consul-discovery        |        8500 | http://192.168.49.2:30002 |
+| bookstore | bookstore-grafana                 |        3000 | http://192.168.49.2:30011 |
+| bookstore | bookstore-influxdb                |        8086 | http://192.168.49.2:30012 |
+| bookstore | bookstore-kapacitor               |        9092 | http://192.168.49.2:30015 |
+| bookstore | bookstore-mysql-db                |        3306 | http://192.168.49.2:30001 |
+| bookstore | bookstore-order-service           |        7001 | http://192.168.49.2:30007 |
+| bookstore | bookstore-payment-service         |        8001 | http://192.168.49.2:30008 |
+| bookstore | bookstore-prometheus              |        9090 | http://192.168.49.2:30010 |
+| bookstore | bookstore-telegraf                |        8125 | http://192.168.49.2:30013 |
+| bookstore | bookstore-zipkin                  |        9411 | http://192.168.49.2:30009 |
+| bookstore | bookstore-zuul-api-gateway-server |        8765 | http://192.168.49.2:30003 |
+|-----------|-----------------------------------|-------------|---------------------------|
+
+
+kubectl scale deployment --all --replicas=0 -n bookstore

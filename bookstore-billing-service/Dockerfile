@@ -2,9 +2,9 @@ FROM openjdk:8-jdk-alpine
 
 VOLUME /tmp
 
-ARG JAR_FILE
 
-COPY target/${JAR_FILE} billing-service.jar
+
+COPY target/*.jar billing-service.jar
 
 #Using Dokerize to check whether db is up, if it is then start this service.
 COPY dockerize dockerize

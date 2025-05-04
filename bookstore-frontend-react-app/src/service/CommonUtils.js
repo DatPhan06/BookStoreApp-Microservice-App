@@ -6,7 +6,7 @@ export const getErrorMessage = (error) => {
       ? error.response.data
         ? error.response.data.error_description
           ? error.response.data.error_description
-          : error.response.data.errors.length > 0
+          : error.response.data.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0
           ? error.response.data.errors[0].message
           : error.message
         : error.message
