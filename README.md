@@ -1,257 +1,245 @@
-# BookStoreApp-Distributed-Application [![HitCount](http://hits.dwyl.io/devdcores/BookStoreApp-Distributed-Application.svg)](http://hits.dwyl.io/devdcores/BookStoreApp-Distributed-Application)
+# BookStoreApp - Ứng Dụng Nhà Sách Phân Tán
 
-<hr>
+[![HitCount](http://hits.dwyl.io/devdcores/BookStoreApp-Distributed-Application.svg)](http://hits.dwyl.io/devdcores/BookStoreApp-Distributed-Application)
 
-## About this project
-This is an Ecommerce project still `development in progress`, where users can adds books to the cart and buy those books.
+---
 
-Application is being developed using Java, Spring and React.
+## 📚 Giới thiệu dự án
 
-Using Spring Cloud Microservices and Spring Boot Framework extensively to make this application distributed. 
+Đây là một dự án Thương mại điện tử (Ecommerce) đang trong quá trình phát triển, cho phép người dùng thêm sách vào giỏ hàng và mua sách.
 
-<hr>
+Ứng dụng được phát triển sử dụng Java, Spring (Spring Boot, Spring Cloud) và React. Kiến trúc Microservices được áp dụng triệt để để xây dựng một hệ thống phân tán.
 
-## Frontend Checkout Flow
-![CheckOutFlow](https://user-images.githubusercontent.com/14878408/103235826-06d5ca00-4969-11eb-87c8-ce618034b4f3.gif)
+---
 
-## Architecture
-All the Microservices are developed using spring boot. 
-This spring boot applications will be registered with eureka discovery server.
+## 🏛️ Kiến trúc hệ thống
 
-FrontEnd React App makes request's to NGINX server which acts as a reverse proxy.
-NGINX server redirects the requests to Zuul API Gateway. 
+![Kiến trúc AWS (Minh họa)](https://user-images.githubusercontent.com/14878408/65784998-000e4500-e171-11e9-96d7-b7c199e74c4c.jpg)
+*(Lưu ý: Sơ đồ này minh họa kiến trúc triển khai dự kiến trên AWS. Kiến trúc hiện tại đang chạy trên Kubernetes)*
 
-Zuul will route the requests to microservice
-based on the url route. Zuul also registers with eureka and gets the ip/domain from eureka for microservice while routing the request. 
+*   **Microservices:** Các dịch vụ lõi (Account, Billing, Catalog, Order, Payment) được xây dựng bằng Spring Boot.
+*   **API Gateway:** `bookstore-zuul-api-gateway-server` (Zuul) đóng vai trò là cổng vào duy nhất cho các yêu cầu từ client. Nó định tuyến yêu cầu đến các microservice phù hợp.
+*   **Service Discovery:**
+    *   Khi chạy với Docker Compose hoặc Kubernetes: `bookstore-consul-discovery` (Consul) được sử dụng để các dịch vụ tự động tìm thấy nhau.
+    *   Khi chạy từng service độc lập trên máy local (qua IDE): Eureka được sử dụng (ít khuyến khích hơn).
+*   **Cơ sở dữ liệu:** `bookstore-mysql-db` (MySQL) lưu trữ dữ liệu cho các dịch vụ.
+*   **Giao diện người dùng (Frontend):** Được xây dựng bằng React (`bookstore-frontend-react-app`).
+*   **Giám sát và Theo dõi (Monitoring & Tracing):**
+    *   **Tracing:** `bookstore-zipkin` thu thập và hiển thị dữ liệu theo dõi phân tán.
+    *   **Monitoring:** Sử dụng kết hợp Prometheus, Grafana và TICK Stack (Telegraf, InfluxDB, Chronograf, Kapacitor) để thu thập, lưu trữ và trực quan hóa metrics hệ thống.
 
-<hr>
+**Luồng giao tiếp chính (Kubernetes):**
 
-## Run this project in Local Machine
+1.  Client (trình duyệt/ứng dụng) gửi yêu cầu đến API Gateway (Zuul) thông qua NodePort của service `bookstore-zuul-api-gateway-server`.
+2.  API Gateway truy vấn Consul Discovery để tìm địa chỉ của microservice cần thiết.
+3.  API Gateway định tuyến yêu cầu đến microservice tương ứng (Account, Catalog, Order, v.v.).
+4.  Các microservices tương tác với nhau (nếu cần) với cơ sở dữ liệu MySQL.
+5.  Tất cả các microservices gửi dữ liệu tracing đến Zipkin.
+6.  Telegraf thu thập metrics từ các services/pods và gửi đến InfluxDB.
+7.  Prometheus thu thập metrics từ các endpoint được cấu hình (có thể thông qua Consul).
+8.  Grafana và Chronograf trực quan hóa dữ liệu từ Prometheus và InfluxDB.
+9.  Kapacitor xử lý dữ liệu từ InfluxDB để tạo cảnh báo.
 
->Frontend App 
+---
 
-Navigate to `bookstore-frontend-react-app` folder
-Run below commnads to start Frontend React Application
+## ⚙️ Điều kiện tiên quyết
 
+*   [Java](https://www.java.com/) (Phiên bản 11 hoặc cao hơn)
+*   [Maven](https://maven.apache.org/)
+*   [Node.js](https://nodejs.org/) và [Yarn](https://yarnpkg.com/) (cho Frontend)
+*   [Docker](https://www.docker.com/) và [Docker Compose](https://docs.docker.com/compose/) (Để chạy với Docker)
+*   [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) (Để tương tác với Kubernetes)
+*   [Git](https://git-scm.com/)
+
+---
+
+## 🚀 Cài đặt và Chạy dự án
+
+Có hai cách chính để chạy dự án: sử dụng Docker Compose (khuyến nghị) hoặc chạy trên Kubernetes.
+
+### 🐳 Chạy với Docker Compose (Khuyến nghị cho môi trường local)
+
+Cách này sẽ khởi chạy tất cả các microservices, cơ sở dữ liệu, Consul, và hệ thống giám sát trong các Docker container.
+
+1.  **Build các microservices:**
+    Mở terminal tại thư mục gốc của dự án và chạy lệnh sau để build tất cả các file JAR:
+    ```bash
+    mvn clean install
+    ```
+
+2.  **Khởi chạy các containers:**
+    ```bash
+    docker-compose up --build
+    ```
+    Lệnh này sẽ build các image (nếu chưa có) và khởi động tất cả các service được định nghĩa trong `docker-compose.yml`.
+
+3.  **Truy cập các dịch vụ:**
+    Các dịch vụ sẽ được expose qua các cổng sau trên máy local của bạn:
+
+    *   **API Gateway (Zuul):** `http://localhost:8765`
+    *   **Consul UI:** `http://localhost:8500`
+    *   **Zipkin:** `http://localhost:9411`
+    *   **Grafana:** `http://localhost:3030` (Tài khoản mặc định: admin/admin)
+    *   **Prometheus:** `http://localhost:9090`
+    *   **Chronograf:** `http://localhost:8888`
+    *   (Các cổng dịch vụ khác như Account, Catalog,... thường không truy cập trực tiếp mà qua API Gateway)
+
+### ☸️ Chạy trên Kubernetes
+
+Phần này mô tả cách triển khai và quản lý ứng dụng trên cụm Kubernetes. Các tệp cấu hình YAML cho Kubernetes nằm trong thư mục `k8s` (giả định, cần kiểm tra lại).
+
+1.  **Build và Push Docker Images:**
+    Bạn cần build Docker image cho từng microservice và push chúng lên một Docker registry (ví dụ: Docker Hub, Google Container Registry). Script `build_and_push.sh` có thể hỗ trợ việc này.
+    ```bash
+    # Cấp quyền thực thi (chỉ lần đầu)
+    chmod +x build_and_push.sh
+
+    # Build và push images (thay 'your-docker-repo' bằng tên repo của bạn)
+    ./build_and_push.sh your-docker-repo
+    ```
+    *Lưu ý: Cần chỉnh sửa script `build_and_push.sh` để trỏ đến đúng Docker repository của bạn.*
+
+2.  **Triển khai lên Kubernetes:**
+    Áp dụng các tệp cấu hình Kubernetes. Giả sử tất cả các tệp YAML nằm trong thư mục `k8s` và bạn muốn triển khai vào namespace `bookstore`:
+    ```bash
+    # Tạo namespace nếu chưa có
+    kubectl create namespace bookstore
+
+    # Áp dụng tất cả cấu hình trong thư mục k8s
+    kubectl apply -f k8s/ -n bookstore
+    ```
+    *Lưu ý: Đường dẫn `k8s/` là giả định. Hãy thay bằng đường dẫn thực tế chứa các tệp YAML của bạn.*
+
+3.  **Kiểm tra trạng thái Pods:**
+    ```bash
+    kubectl get pods -n bookstore
+    ```
+    Đảm bảo tất cả các pods đang ở trạng thái `Running`.
+
+4.  **Truy cập ứng dụng qua NodePort:**
+    Các dịch vụ được expose ra bên ngoài cụm Kubernetes thông qua NodePort. Bạn cần địa chỉ IP của một trong các worker node trong cụm Kubernetes và các NodePort tương ứng:
+
+    | Dịch vụ                          | Cổng nội bộ (Port) | Cổng Node (NodePort) |
+    | ------------------------------- | ------------------- | -------------------- |
+    | MySQL DB                        | 3306                | 30001                |
+    | Consul Discovery                | 8500                | 30002                |
+    | **Zuul API Gateway**            | **8765**            | **30003**            |
+    | Account Service                 | 4001                | 30004                |
+    | Billing Service                 | 5001                | 30005                |
+    | Catalog Service                 | 6001                | 30006                |
+    | Order Service                   | 7001                | 30007                |
+    | Payment Service                 | 8001                | 30008                |
+    | Zipkin                          | 9411                | 30009                |
+    | Prometheus                      | 9090                | 30010                |
+    | Grafana                         | 3000                | 30011                |
+    | InfluxDB                        | 8086                | 30012                |
+    | Telegraf                        | 8125 (UDP)          | 30013                |
+    | Chronograf                      | 8888                | 30014                |
+    | Kapacitor                       | 9092                | 30015                |
+
+    Truy cập API Gateway: `http://<WORKER_NODE_IP>:30003`
+    Truy cập Grafana: `http://<WORKER_NODE_IP>:30011`
+    Truy cập Zipkin: `http://<WORKER_NODE_IP>:30009`
+    ... và các dịch vụ giám sát khác.
+
+5.  **Một số lệnh `kubectl` hữu ích khác:**
+    ```bash
+    # Xem logs của một pod cụ thể (thay <pod-name>)
+    kubectl logs <pod-name> -n bookstore
+
+    # Truy cập vào shell của một pod (thay <pod-name>)
+    kubectl exec -it <pod-name> -n bookstore -- /bin/sh
+
+    # Xem thông tin chi tiết của một service (ví dụ: zuul)
+    kubectl describe svc bookstore-zuul-api-gateway-server -n bookstore
+
+    # Khởi động lại một deployment (ví dụ: zuul)
+    kubectl rollout restart deployment/bookstore-zuul-api-gateway-server -n bookstore
+
+    # Scale một deployment (ví dụ: scale account-service lên 3 replicas)
+    kubectl scale deployment/bookstore-account-service --replicas=3 -n bookstore
+
+    # Xóa tất cả tài nguyên trong namespace bookstore (CẨN THẬN!)
+    # kubectl delete all --all -n bookstore
+    ```
+
+### 💻 Chạy Frontend (React App)
+
+1.  **Điều hướng đến thư mục frontend:**
+    ```bash
+    cd bookstore-frontend-react-app
+    ```
+2.  **Cài đặt dependencies:**
+    ```bash
+    yarn install
+    ```
+3.  **Khởi chạy ứng dụng:**
+    ```bash
+    yarn start
+    ```
+    Ứng dụng React sẽ chạy trên `http://localhost:3000` (hoặc một cổng khác nếu 3000 đã bị chiếm dụng). Nó sẽ giao tiếp với API Gateway (chạy trên Docker hoặc Kubernetes).
+
+---
+
+## 📊 Giám sát và Theo dõi
+
+Hệ thống tích hợp sẵn các công cụ mạnh mẽ để giám sát và theo dõi:
+
+*   **Zipkin:** Theo dõi luồng xử lý yêu cầu qua các microservices.
+    *   UI: `http://<địa_chỉ>:9411` (Docker) hoặc `http://<WORKER_NODE_IP>:30009` (Kubernetes)
+*   **Prometheus:** Thu thập và lưu trữ metrics.
+    *   UI: `http://<địa_chỉ>:9090` (Docker) hoặc `http://<WORKER_NODE_IP>:30010` (Kubernetes)
+*   **Grafana:** Trực quan hóa metrics từ Prometheus/InfluxDB.
+    *   UI: `http://<địa_chỉ>:3030` (Docker) hoặc `http://<WORKER_NODE_IP>:30011` (Kubernetes)
+    *   Đăng nhập lần đầu: `admin` / `admin`
+*   **TICK Stack (InfluxDB, Telegraf, Chronograf, Kapacitor):** Một bộ công cụ khác để thu thập, lưu trữ, trực quan hóa và cảnh báo metrics.
+    *   **Chronograf UI:** `http://<địa_chỉ>:8888` (Docker) hoặc `http://<WORKER_NODE_IP>:30014` (Kubernetes)
+
+**(Các ảnh chụp màn hình Zipkin, Grafana, Chronograf như trong README gốc có thể được giữ lại ở đây)**
+
+---
+
+## 🔧 Khắc phục sự cố
+
+*   **Vấn đề kết nối giữa các service:**
+    *   Kiểm tra logs của API Gateway (Zuul) và service discovery (Consul).
+    *   Đảm bảo các service đã đăng ký thành công với Consul.
+    *   Kiểm tra cấu hình định tuyến (routes) trong Zuul.
+    *   Kiểm tra Network Policies trong Kubernetes (nếu có).
+    *   Sử dụng `kubectl logs` và `kubectl describe` để kiểm tra trạng thái và sự kiện của các pod/service.
+*   **Vấn đề cơ sở dữ liệu:**
+    *   Nếu gặp lỗi liên quan đến schema database khi khởi động, có thể do thay đổi cấu trúc bảng chưa được áp dụng đồng bộ.
+    *   Trong môi trường phát triển, giải pháp nhanh là xóa và tạo lại database `bookstore_db`. **CẨN THẬN: Chỉ thực hiện trên môi trường phát triển, sẽ mất hết dữ liệu.**
+*   **Không truy cập được ứng dụng:**
+    *   Kiểm tra xem các Pod có đang chạy không (`kubectl get pods -n bookstore`).
+    *   Kiểm tra xem các Service có đang chạy và có Endpoints không (`kubectl get svc -n bookstore`, `kubectl get endpoints -n bookstore`).
+    *   Kiểm tra xem NodePort có bị chặn bởi firewall không.
+    *   Kiểm tra logs của Ingress controller (nếu sử dụng) và API Gateway.
+
+Nếu gặp sự cố không giải quyết được, vui lòng tạo [Issue trên Github](https://github.com/devdcores/BookStoreApp-Distributed-Application/issues).
+
+---
+
+## 🔑 Thông tin xác thực (Ví dụ cho Account Service)
+
+Để lấy `access_token` cho người dùng, bạn cần `clientId` và `clientSecret` (đây là thông tin cấu hình trong `account-service`).
+
+*   **clientId:** `93ed453e-b7ac-4192-a6d4-c45fae0d99ac` (Ví dụ)
+*   **clientSecret:** `client.devd123` (Ví dụ)
+
+**Người dùng mẫu:**
+
+*   **Admin:**
+    *   userName: `admin.admin`
+    *   password: `admin.devd123`
+*   **Normal User:**
+    *   userName: `devd.cores`
+    *   password: `cores.devd123`
+
+**Lấy Access Token (Ví dụ cho Admin User khi chạy local/docker):**
+
+```bash
+curl -u 93ed453e-b7ac-4192-a6d4-c45fae0d99ac:client.devd123 http://localhost:4001/oauth/token -d grant_type=password -d username=admin.admin -d password=admin.devd123
 ```
-yarn install
-yarn start
-```
 
->Backend Services
->
-To Start Backend Services follow below steps.
->Using Intellij/Eclipse or Command Line
-
-Import this project into IDE and run all Spring boot projects or 
-build all the jars running `mvn clean install` command in root parent pom, which builds all jars.
-All services will be up in the below mentioned ports.
-
-But running this way we wont get monitoring of microservices. 
-So if monitoring needed to see metrics like jvm memory, tomcat error count and other metrics.
-
-Use below method to deploy all the services and monitoring setup in docker.
-
->Using Docker(Recommended)
-
-Start Docker Engine in your machine.
-
-Run `mvn clean install` at root of project to build all the microservices jars.
-
-Run `docker-compose up --build` to start all the containers.
-
-Use the `Postman Api collection` in the Postman directory. To make request to various services.
-
-Services will be exposed in this ports
-
-```
-Api Gateway Service       : 8765
-Eureka Discovery Service  : 8761
-Consul Discovery          : 8500
-Account Service           : 4001
-Billing Service           : 5001
-Catalog Service           : 6001
-Order Service             : 7001
-Payment Service           : 8001
-```
-
-<hr>
-
-### Service Discovery
-This project uses Eureka or Consul as Discovery service.
-
-While running services in local, then using eureka as service discovery.
-
-While running using docker, then consul is the service discovery. 
-
-Reason to use Consul is it has better features and support compared to Eureka. Running services individually in local uses Eureka as service discovery because dont want to run consul agent and set it up as it becomes extra overhead to manage. Since docker-compose manages all consul stuff hence using Consul while running services in docker.
-
-<hr>
-
-### Troubleshooting
-
-If any issue while starting up services or any api failing.
-It may be because of new columns or new tables, at this point of time i am not worried much about DB migrations.
-
-So any issues, **clear/drop bookstore_db**, things may start working agai, if not **raise a Issue in Github** i will help.
-
-<hr>
-
-## Deployment(In Future It will be deployed like this)
-AWS is the cloud provider will be using to deploy this project.
-
-Project wil deployed in multiple Regions and multiple Availability Zones. 
-
-React App, Zuul and Eureka will be the public facing service, which will be in public subnet
-
-All the microservices will be packed into docker containers and deployes in the AWS ECS in the private subnet.
-
-Private subnets uses NAT Gateway to make requests to external internet.
-
-Bastian host can be used to ssh into private subnet microservices.
-
-Below is the AWS Architecture diagram for better understanding.
-
-![Bookstore Final](https://user-images.githubusercontent.com/14878408/65784998-000e4500-e171-11e9-96d7-b7c199e74c4c.jpg)
-
-<hr>
-
-## Monitoring
-There are 2 setups for monitoring
-
-1. Prometheus and Graphana.
-2. TICK stack monitoring.
-
-Both the setups are very powerful, where prometheus works on pull model. we have to provide target hosts where the prometheus can pull the metrics from. If we specify target hosts using individual hostname/ip its not feasible at end because it will be like hard coded hostnames/ip. So we use Consul discovery to provide target hosts dynamically. By this way when more instances added for same service no need to worry about adding to prometheus target hosts because consul will dynamically add this target in prometheus.
-
-TICK(Telegraf, InfluxDB, Chronograf, Kapacitor) This setup is getting more attention due to its push and pull model. InfluxDB is a time series database, bookstore services push the metrics to influxDB(push model), In Telegraf we specify the targets to pull metrics(pull model). Chronograf/Graphana can be used to view the graph/charts. Kapacitor is used to configure rules for alarms.
-
-`docker-compose` will take care of bringing all this monitoring containers up.
-
-Dashboards are available at below ports
-
-```
-Graphana   : 3030
-Zipkin     : 9411
-Prometheus : 9090
-Telegraf   : 8125
-InfluxDb   : 8086
-Chronograf : 8888
-Kapacitor  : 9092 
-
-```
-
-```
-First time login to Graphana use below credentials
-
-Username : admin  
-Password : admin
-
-```
-
-<hr>
-
-**Screenshots of Tracing in Zipkin.**
-
-<img alt="Zipkin" src="https://user-images.githubusercontent.com/14878408/65939069-6b426a80-e442-11e9-90fd-d54b60786d41.png">
-<hr>
-<img alt="Zipkin" src="https://user-images.githubusercontent.com/14878408/65939165-bb213180-e442-11e9-9ad7-5cfd4fa121ef.png">
-
-<hr>
-
-**Screenshots of Monitoring in Graphana.**
-
-<img width="1680" alt="Screen Shot 2019-10-16 at 9 16 21 PM" src="https://user-images.githubusercontent.com/14878408/66936473-65ac6d80-f05b-11e9-9e7d-9652059438cd.png">
-
-
-<img width="1680" alt="Screen Shot 2019-10-16 at 9 16 12 PM" src="https://user-images.githubusercontent.com/14878408/66936524-79f06a80-f05b-11e9-8898-1002813aad8e.png">
-
-<hr>
-
-**Screenshots of Monitoring in Chronograf(TICK).**
-
-![Screen Shot 2019-10-16 at 12 44 20 PM](https://user-images.githubusercontent.com/14878408/66934353-f8e3a400-f057-11e9-82ab-eda7a230c09d.png)
-
-![Screen Shot 2019-10-16 at 12 52 08 PM](https://user-images.githubusercontent.com/14878408/66934482-2e888d00-f058-11e9-8dea-f1f275765265.png)
-
-<hr>
-
-> Account Service
-
-To Get `access_token` for the user, you need `clientId` and `clientSecret`
-
-```
-clientId : '93ed453e-b7ac-4192-a6d4-c45fae0d99ac'
-clientSecret : 'client.devd123'
-```
-
-There are 2 users in the system currently. 
-ADMIN, NORMAL USER
-
-```
-Admin 
-userName: 'admin.admin'
-password: 'admin.devd123'
-```
-
-```
-Normal User 
-userName: 'devd.cores'
-password: 'cores.devd123'
-```
-
-*To get the accessToken (Admin User)* 
-
-```curl 93ed453e-b7ac-4192-a6d4-c45fae0d99ac:client.devd123@localhost:4001/oauth/token -d grant_type=password -d username=admin.admin -d password=admin.devd123```
-
-<hr>
-
-
-kubectl delete all --all -n bookstore
-
-MySQL: 30001
-Consul: 30002
-Zuul Gateway: 30003
-Account Service: 30004
-Billing Service: 30005
-Catalog Service: 30006
-Order Service: 30007
-Payment Service: 30008
-Zipkin: 30009
-Prometheus: 30010
-Grafana: 30011
-InfluxDB: 30012
-Telegraf: 30013 (UDP)
-Chronograf: 30014
-Kapacitor: 30015
-
-minikube start --memory=6g --cpus=4
-
-chmod +x build_and_push.sh && ./build_and_push.sh docker-hub
-
-kubectl get pods -n bookstore
-
-dat@instance-20250411-160829:~/Workspace/test/BookStoreApp-Distributed-Application$ minikube service list
- -n bookstore
-|-----------|-----------------------------------|-------------|---------------------------|
-| NAMESPACE |               NAME                | TARGET PORT |            URL            |
-|-----------|-----------------------------------|-------------|---------------------------|
-| bookstore | bookstore-account-service         |        4001 | http://192.168.49.2:30004 |
-| bookstore | bookstore-billing-service         |        5001 | http://192.168.49.2:30005 |
-| bookstore | bookstore-catalog-service         |        6001 | http://192.168.49.2:30006 |
-| bookstore | bookstore-chronograf              |        8888 | http://192.168.49.2:30014 |
-| bookstore | bookstore-consul-discovery        |        8500 | http://192.168.49.2:30002 |
-| bookstore | bookstore-grafana                 |        3000 | http://192.168.49.2:30011 |
-| bookstore | bookstore-influxdb                |        8086 | http://192.168.49.2:30012 |
-| bookstore | bookstore-kapacitor               |        9092 | http://192.168.49.2:30015 |
-| bookstore | bookstore-mysql-db                |        3306 | http://192.168.49.2:30001 |
-| bookstore | bookstore-order-service           |        7001 | http://192.168.49.2:30007 |
-| bookstore | bookstore-payment-service         |        8001 | http://192.168.49.2:30008 |
-| bookstore | bookstore-prometheus              |        9090 | http://192.168.49.2:30010 |
-| bookstore | bookstore-telegraf                |        8125 | http://192.168.49.2:30013 |
-| bookstore | bookstore-zipkin                  |        9411 | http://192.168.49.2:30009 |
-| bookstore | bookstore-zuul-api-gateway-server |        8765 | http://192.168.49.2:30003 |
-|-----------|-----------------------------------|-------------|---------------------------|
-
-
-kubectl scale deployment --all --replicas=0 -n bookstore
+*Lưu ý: Khi chạy trên Kubernetes, bạn cần thay `localhost:4001` bằng endpoint phù hợp (ví dụ: qua API Gateway `http://<WORKER_NODE_IP>:30003/account/oauth/token` - cần kiểm tra lại cấu hình route của Zuul).*
