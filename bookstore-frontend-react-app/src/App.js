@@ -20,36 +20,39 @@ import ProductEditScreen from './screens/ProductEditScreen';
 import ProductCreateScreen from './screens/ProductCreateScreen';
 import { createBrowserHistory } from 'history';
 import OrderListScreen from './screens/OrderListScreen';
+import BookChatbot from './components/BookChatbot';
 
 export const history = createBrowserHistory();
 
 function App() {
   return (
-    <BrowserRouter history={history}>
-      <Header></Header>
-      <main className='py-3'>
-        <Container>
-          <Route path='/order/:id' component={OrderScreen} />
-          <Route path='/login' component={LoginScreen}></Route>
-          <Route path='/payment' component={PaymentScreen}></Route>
-          <Route path='/placeOrder' component={PlaceOrderScreen}></Route>
-          <Route path='/shipping' component={ShippingScreen}></Route>
-          <Route path='/userProfile' component={ProfileScreen} />
-          <Route path='/register' component={RegisterScreen}></Route>
-          <Route path='/product/:id' component={ProductScreen}></Route>
-          <Route path='/cart/:id?' component={CartScreen}></Route>
-          <Route path='/admin/userlist' component={UserListScreen} />
-          <Route path='/admin/user/:id/edit' component={UserEditScreen} />
-          <Route path='/admin/productlist' component={ProductListScreen} exact />
-          <Route path='/admin/productlist/:pageNumber' component={ProductListScreen} exact />
-          <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
-          <Route path='/admin/product/create' component={ProductCreateScreen} />
-          <Route path='/admin/orderlist' component={OrderListScreen} />
-          <Route path='/' component={HomeScreen} exact></Route>
-        </Container>
-      </main>
-      <Footer> </Footer>
-    </BrowserRouter>
+    
+      <BrowserRouter history={history}>
+        <Header></Header>
+        <main className='py-3'>
+          <Container>
+            <Route path='/order/:id' component={OrderScreen} />
+            <Route path='/login' component={LoginScreen}></Route>
+            <Route path='/payment' component={PaymentScreen}></Route>
+            <Route path='/placeOrder' component={PlaceOrderScreen}></Route>
+            <Route path='/shipping' component={ShippingScreen}></Route>
+            <Route path='/userProfile' component={ProfileScreen} />
+            <Route path='/register' component={RegisterScreen}></Route>
+            <Route path='/product/:id' component={ProductScreen}></Route>
+            <Route path='/cart/:id?' component={CartScreen}></Route>
+            <Route path='/admin/userlist' component={UserListScreen} />
+            <Route path='/admin/user/:id/edit' component={UserEditScreen} />
+            <Route path='/admin/productlist' component={ProductListScreen} exact />
+            <Route path='/admin/productlist/:pageNumber' component={ProductListScreen} exact />
+            <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
+            <Route path='/admin/product/create' component={ProductCreateScreen} />
+            <Route path='/admin/orderlist' component={OrderListScreen} />
+            <Route path='/' component={HomeScreen} exact></Route>
+          </Container>
+        </main>
+        <Footer> </Footer>
+        <BookChatbot />
+      </BrowserRouter>
   );
 }
 
