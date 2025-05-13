@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const BACKEND_API_GATEWAY_URL = process.env.REACT_APP_BACKEND_API_GATEWAY_URL || 'http://localhost:8765';
+import { BACKEND_API_GATEWAY_URL } from '../constants/appConstants';
 
 export const fetchBooks = async () => {
   try {
