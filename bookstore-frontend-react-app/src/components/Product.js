@@ -3,36 +3,51 @@ import { BACKEND_API_GATEWAY_URL } from '../constants/appConstants';
 import { Card } from 'react-bootstrap';
 import Rating from './Rating';
 import { Link } from 'react-router-dom';
+import './Product.css';
 
 const Product = (props) => {
   const product = props.product;
   return (
-    <>
-      <Card className='my-3 rounded' style={{ height: '400px' }}>
+    <Card className='product-card'>
+      <div className="product-image-container">
         <Link to={`/product/${product.productId}`}>
           <Card.Img
+            className="product-image"
             src={`${BACKEND_API_GATEWAY_URL}/api/catalog/image/${product?.imageId}`}
-            variant='top'
-            style={{ height: '250px' }}
-          ></Card.Img>
+            alt={product.productName}
+          />
         </Link>
-        <Card.Body>
+        
+        {/* Badge hiển thị nếu sách mới */}
+        {product.isNew && (
+          <div className="product-badge">Mới</div>
+        )}
+      </div>
+      
+      <div className="product-body">
+        {product.productCategory && (
+          <div className="product-category">{product.productCategory}</div>
+        )}
+        
+        <h3 className="product-title">
           <Link to={`/product/${product.productId}`}>
-            <Card.Title as='div'>
-              <strong>{product.productName}</strong>
-            </Card.Title>
+            {product.productName}
           </Link>
-
-          <Card.Text as='div'>
-            <Rating value={product.averageRating} text={`${product.noOfRatings} reviews`}></Rating>
-          </Card.Text>
-
-          <Card.Text as='div' className='my-3'>
-            <p>${product.price}</p>
-          </Card.Text>
-        </Card.Body>
-      </Card>
-    </>
+        </h3>
+        
+        <div className="product-rating">
+          <Rating 
+            value={product.averageRating} 
+            text={`${product.noOfRatings} đánh giá`} 
+          />
+        </div>
+        
+        <div className="product-price">
+          <span className="product-price-currency">$</span>
+          {product.price}
+        </div>
+      </div>
+    </Card>
   );
 };
 

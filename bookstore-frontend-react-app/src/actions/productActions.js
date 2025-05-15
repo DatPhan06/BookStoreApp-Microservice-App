@@ -27,6 +27,7 @@ import {
   PRODUCT_IMAGE_SUCCESS,
   PRODUCT_IMAGE_FAIL
 } from '../constants/productConstants';
+import { BACKEND_API_GATEWAY_URL } from '../constants/appConstants'; // Thêm dòng này
 import { getErrorMessage } from '../service/CommonUtils';
 import {
   getAllProductsDetailApi,
@@ -38,16 +39,62 @@ import {
   deleteProductApi,
   getImageApi
 } from '../service/RestApiCalls';
+import { logout } from '../actions/userActions'; 
 
-export const listProductsAction = (pageNumber) => async (dispatch) => {
+// export const listProductsAction = (pageNumber) => async (dispatch) => {
+//   try {
+//     dispatch({ type: PRODUCT_LIST_REQUEST });
+//     //Get All Products Detail
+//     const allProductsDetail = await getAllProductsDetailApi(pageNumber || 0);
+//     dispatch({
+//       type: PRODUCT_LIST_SUCCESS,
+//       payload: allProductsDetail.page.content,
+//       pageResponse: allProductsDetail.page
+//     });
+//   } catch (error) {
+//     dispatch({
+//       type: PRODUCT_LIST_FAIL,
+//       payload: getErrorMessage(error)
+//     });
+//   }
+// };
+
+export const listProductsAction = (pageNumber, keyword = '') => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_LIST_REQUEST });
-    //Get All Products Detail
-    const allProductsDetail = await getAllProductsDetailApi(pageNumber || 0);
+
+    let data;
+    
+    if (keyword && keyword.trim() !== '') {
+      // Sử dụng API tìm kiếm với từ khóa
+      let url = `${BACKEND_API_GATEWAY_URL}/api/catalog/products?page=${pageNumber}`;
+      url += `&name=${encodeURIComponent(keyword)}`;
+      
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error('Không thể tìm kiếm sản phẩm');
+      }
+    } else {
+      // Sử dụng API gốc khi không có từ khóa
+      const allProductsDetail = await getAllProductsDetailApi(pageNumber || 0);
+      data = {
+        content: allProductsDetail.page.content,
+        page: allProductsDetail.page
+      };
+    }
+    
     dispatch({
       type: PRODUCT_LIST_SUCCESS,
-      payload: allProductsDetail.page.content,
-      pageResponse: allProductsDetail.page
+      payload: data.content || data.page?.content,
+      pageResponse: data.page
     });
   } catch (error) {
     dispatch({
@@ -204,3 +251,4 @@ export const updateProductAction = (productReqBody) => async (dispatch) => {
     });
   }
 };
+
