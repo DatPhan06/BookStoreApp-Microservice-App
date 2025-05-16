@@ -243,3 +243,29 @@ curl -u 93ed453e-b7ac-4192-a6d4-c45fae0d99ac:client.devd123 http://localhost:400
 ```
 
 *Lưu ý: Khi chạy trên Kubernetes, bạn cần thay `localhost:4001` bằng endpoint phù hợp (ví dụ: qua API Gateway `http://<WORKER_NODE_IP>:30003/account/oauth/token` - cần kiểm tra lại cấu hình route của Zuul).*
+
+## CI/CD cho ứng dụng
+CI/CD sử dụng GitHub Actions 
+- Buid và test Backend (microservices)
+- Build frontend (React App)
+- Push Docker images lên Docker Hub
+- Triển khai lên Kubernetes
+
+#### Cấu hình Github ActionsActions
+GitHub Actions sử dụng các file YAML trong thư mục  `.github/workflows/` để định nghĩa pipeline.
+
+###### Các Jobs: 
+- Buid & Test Backend
+- Buid frontend 
+- Build & push docker 
+- Deploy to kubernetes
+
+###### Cấu hình secrets trong Github (Admin Repository)
+- Truy cập repository trên Github -> Setting -> Secrets and variables -> Actions -> New repository secret
+- Thêm các secrets dưới đây: 
+    + `DOCKER_USERNAME`: Tên người dùng Docker Hub.
+    + `DOCKER_PASSWORD`: Mật khẩu hoặc Access Token của Docker Hub.
+    + `KUBE_CONFIG`: Nội dung file `~/.kube/config` của cụm Kubernetes (base64-encoded hoặc plain text, tùy thuộc vào cách cấu hình).
+
+#### (Optional for admin) Thiết lập branch protection rule 
+

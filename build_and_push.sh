@@ -6,12 +6,14 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Xác định prefix cho Docker Hub repository (thay thế bằng username của bạn)
-DOCKER_HUB_PREFIX="datfan06"
+# DOCKER_HUB_PREFIX="datfan06"
+DOCKER_HUB_PREFIX=${1:-"datfan06"}  # default prefix is datfan06
 
 # Chọn mode: local (chỉ build), minikube (build và load), docker-hub (build và push)
 MODE=${1:-"docker-hub"}  # default mode is minikube
 
-echo -e "${GREEN}Building images in $MODE mode...${NC}"
+# echo -e "${GREEN}Building images in $MODE mode...${NC}"
+echo -e "${GREEN}Building images in $MODE mode for Docker Hub user: $DOCKER_HUB_PREFIX...${NC}"
 
 # Danh sách các service cần build bằng Maven
 MAVEN_SERVICES=(
