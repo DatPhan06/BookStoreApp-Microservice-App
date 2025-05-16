@@ -45,6 +45,7 @@ SERVICES=(
     "bookstore-prometheus:bookstore-prometheus:"
     "bookstore-graphana:graphana:"
     "bookstore-telegraph:bookstore-telegraf:"
+    "bookstore-frontend-react-app:bookstore-frontend-react-app:"
 )
 
 # Build và load/push Docker images

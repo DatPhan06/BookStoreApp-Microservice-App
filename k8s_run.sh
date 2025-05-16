@@ -14,3 +14,4 @@ kubectl apply -f k8s/zipkin.yaml
 kubectl apply -f k8s/prometheus.yaml
 kubectl apply -f k8s/grafana.yaml
 kubectl apply -f k8s/tick-stack.yaml
+kubectl apply -f k8s/frontend.yaml
