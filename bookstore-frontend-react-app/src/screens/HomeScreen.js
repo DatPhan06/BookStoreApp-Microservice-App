@@ -33,6 +33,63 @@ const HomeScreen = () => {
   };
 
   return (
+    <>
+        <div className="category-links-container">
+      <div className="category-links">
+        <button 
+          className={`category-button ${keyword === '' ? 'active' : ''}`} 
+          onClick={() => setKeyword('')}
+        >
+          <i className="fas fa-book"></i>
+          <span>Tất cả sách</span>
+        </button>
+        
+        <button 
+          className={`category-button ${keyword === 'fiction' ? 'active' : ''}`} 
+          onClick={() => setKeyword('fiction')}
+        >
+          <i className="fas fa-feather-alt"></i>
+          <span>Tiểu thuyết</span>
+        </button>
+        
+        <button 
+          className={`category-button ${keyword === 'science' ? 'active' : ''}`} 
+          onClick={() => setKeyword('science')}
+        >
+          <i className="fas fa-atom"></i>
+          <span>Khoa học</span>
+        </button>
+        
+        <button 
+          className={`category-button ${keyword === 'business' ? 'active' : ''}`} 
+          onClick={() => setKeyword('business')}
+        >
+          <i className="fas fa-chart-line"></i>
+          <span>Kinh doanh</span>
+        </button>
+        
+        <button 
+          className={`category-button ${keyword === 'biography' ? 'active' : ''}`} 
+          onClick={() => setKeyword('biography')}
+        >
+          <i className="fas fa-user-tie"></i>
+          <span>Tiểu sử</span>
+        </button>
+        
+        <button 
+          className={`category-button ${keyword === 'children' ? 'active' : ''}`} 
+          onClick={() => setKeyword('children')}
+        >
+          <i className="fas fa-child"></i>
+          <span>Thiếu nhi</span>
+        </button>
+      </div>
+    </div>
+  
+
+      <div className="home-banner">
+        <img src="/8620842.jpg" alt="BookStore Banner" />
+      </div>
     <Container className="home-screen">
       <div className="home-header">
         <h1>Khám Phá Sách Mới</h1>
@@ -115,10 +172,12 @@ const HomeScreen = () => {
               />
             </div>
           )}
+
         </>
       )}
       {loading && <FullPageLoader />}
     </Container>
+  </>
   );
 };
 
