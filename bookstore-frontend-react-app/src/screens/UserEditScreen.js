@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Container, Card, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import FormContainer from '../components/FormContainer';
 import { getUserDetails, updateUserAction } from '../actions/userActions';
 import { USER_UPDATE_RESET } from '../constants/userConstants';
 import { getAllRolesApi } from '../service/RestApiCalls';
+import './UserEditScreen.css';
 
 const UserEditScreen = ({ match, history }) => {
   const userId = match.params.id;
@@ -72,68 +72,146 @@ const UserEditScreen = ({ match, history }) => {
   };
 
   return (
-    <>
-      <Link to='/admin/userlist' className='btn btn-dark my-3'>
-        Go Back
-      </Link>
-      <FormContainer>
-        <h1>Edit User</h1>
-        {loadingUpdate && <Loader />}
-        {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <Message variant='danger'>{error}</Message>
-        ) : (
-          <Form onSubmit={submitHandler}>
-            <Form.Group controlId='firstName'>
-              <Form.Label>First Name</Form.Label>
-              <Form.Control
-                type='name'
-                placeholder='Enter first name'
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
-
-            <Form.Group controlId='lastName'>
-              <Form.Label>Last Name</Form.Label>
-              <Form.Control
-                type='name'
-                placeholder='Enter last name'
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
-
-            <Form.Group controlId='email'>
-              <Form.Label>Email Address</Form.Label>
-              <Form.Control type='email' placeholder='Enter email' value={email} onChange={(e) => setEmail(e.target.value)}></Form.Control>
-            </Form.Group>
-
-            {roles.length > 0 &&
-              roles.map((role) => (
-                <div key={role.roleName}>
-                  <Form.Check
-                    key={role.roleName}
-                    inline
-                    label={`ROLE : ${role.roleName}`}
-                    type='checkbox'
-                    id={role.roleName}
-                    checked={!!checkedItems.get(`${role.roleName}`)}
-                    name={role.roleName}
-                    onChange={handleChange}
-                  />
+    <div className="user-edit-screen">
+      <Container>
+        <Link to='/admin/userlist' className='back-button'>
+          <i className="fas fa-arrow-left"></i> Quay lại danh sách người dùng
+        </Link>
+        
+        <Row className="justify-content-center">
+          <Col lg={8}>
+            <Card className="user-edit-card">
+              <Card.Body>
+                <div className="user-edit-header">
+                  <div className="icon-wrapper">
+                    <i className="fas fa-user-edit"></i>
+                  </div>
+                  <h1>Chỉnh sửa thông tin người dùng</h1>
+                  {user && user.userName && (
+                    <div className="username-badge">
+                      <i className="fas fa-user"></i> {user.userName}
+                    </div>
+                  )}
                 </div>
-              ))}
 
-            <Button className='mt-3' type='submit' variant='primary'>
-              Update
-            </Button>
-          </Form>
-        )}
-      </FormContainer>
-    </>
+                {loadingUpdate && <Loader />}
+                {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
+                {successUpdate && <Message variant='success'>Cập nhật thành công!</Message>}
+
+                {loading ? (
+                  <div className="loader-container">
+                    <Loader />
+                  </div>
+                ) : error ? (
+                  <Message variant='danger'>{error}</Message>
+                ) : (
+                  <Form onSubmit={submitHandler} className="user-edit-form">
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group controlId='firstName' className="mb-3">
+                          <Form.Label>Họ và tên đệm</Form.Label>
+                          <div className="input-group">
+                            <div className="input-group-prepend">
+                              <span className="input-group-text">
+                                <i className="fas fa-user-tag"></i>
+                              </span>
+                            </div>
+                            <Form.Control
+                              type='text'
+                              placeholder='Nhập họ và tên đệm'
+                              value={firstName}
+                              onChange={(e) => setFirstName(e.target.value)}
+                              className="form-input"
+                            />
+                          </div>
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group controlId='lastName' className="mb-3">
+                          <Form.Label>Tên</Form.Label>
+                          <div className="input-group">
+                            <div className="input-group-prepend">
+                              <span className="input-group-text">
+                                <i className="fas fa-signature"></i>
+                              </span>
+                            </div>
+                            <Form.Control
+                              type='text'
+                              placeholder='Nhập tên'
+                              value={lastName}
+                              onChange={(e) => setLastName(e.target.value)}
+                              className="form-input"
+                            />
+                          </div>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+
+                    <Form.Group controlId='email' className="mb-4">
+                      <Form.Label>Email</Form.Label>
+                      <div className="input-group">
+                        <div className="input-group-prepend">
+                          <span className="input-group-text">
+                            <i className="fas fa-envelope"></i>
+                          </span>
+                        </div>
+                        <Form.Control
+                          type='email'
+                          placeholder='Nhập địa chỉ email'
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="form-input"
+                        />
+                      </div>
+                    </Form.Group>
+
+                    {roles.length > 0 && (
+                      <div className="roles-section">
+                        <h4 className="roles-title">
+                          <i className="fas fa-shield-alt"></i> Phân quyền người dùng
+                        </h4>
+                        <div className="roles-container">
+                          {roles.map((role) => (
+                            <div key={role.roleName} className="role-item">
+                              <Form.Check
+                                custom
+                                type="checkbox"
+                                id={role.roleName}
+                                label={role.roleName}
+                                checked={!!checkedItems.get(role.roleName)}
+                                name={role.roleName}
+                                onChange={handleChange}
+                                className={`role-checkbox ${role.roleName === 'ADMIN_USER' ? 'admin-role' : ''}`}
+                              />
+                              <div className="role-icon">
+                                {role.roleName === 'ADMIN_USER' ? (
+                                  <i className="fas fa-user-shield"></i>
+                                ) : (
+                                  <i className="fas fa-user"></i>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="form-actions">
+                      <Button type='submit' className="update-button">
+                        <i className="fas fa-save"></i> Lưu thay đổi
+                      </Button>
+                      <Link to='/admin/userlist' className="cancel-button">
+                        <i className="fas fa-times"></i> Hủy bỏ
+                      </Link>
+                    </div>
+                  </Form>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 };
 
