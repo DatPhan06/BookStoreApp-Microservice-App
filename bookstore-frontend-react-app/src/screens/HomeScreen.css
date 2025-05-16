@@ -358,3 +358,100 @@
   transform: translateY(-3px);
   box-shadow: 0 8px 15px rgba(166, 227, 233, 0.2);
 }
+
+/* Thêm CSS cho Banner */
+.home-banner {
+  position: relative;
+  width: 100vw; /* Sử dụng viewport width thay vì % */
+  height: auto;
+  overflow: hidden;
+  margin-bottom: 40px;
+  margin-left: calc(-50vw + 50%); 
+  margin-right: calc(-50vw + 50%);
+}
+
+.home-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+.category-links-container {
+  padding: 15px 0;
+  margin-bottom: 1px;
+  position: relative;
+  z-index: 10;
+}
+
+.category-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.category-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #5e6472;
+  font-weight: 600;
+  padding: 10px 20px;
+  margin: 0 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  min-width: 100px;
+  position: relative;
+}
+
+.category-button i {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+  transition: all 0.3s ease;
+  color: #a6e3e9;
+}
+
+.category-button span {
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.category-button:hover {
+  background: linear-gradient(135deg, rgba(166, 227, 233, 0.1), rgba(249, 197, 209, 0.1));
+  transform: translateY(-3px);
+}
+
+.category-button:hover i {
+  transform: scale(1.2);
+  color: #f9c5d1;
+}
+
+.category-button.active {
+  background: linear-gradient(135deg, rgba(166, 227, 233, 0.2), rgba(249, 197, 209, 0.2));
+  box-shadow: 0 4px 10px rgba(166, 227, 233, 0.3);
+}
+
+.category-button.active i {
+  color: #f9c5d1;
+}
+
+.category-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: linear-gradient(to right, #a6e3e9, #f9c5d1);
+  border-radius: 10px;
+}
+
