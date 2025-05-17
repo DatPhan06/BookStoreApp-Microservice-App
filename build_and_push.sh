@@ -9,9 +9,11 @@ NC='\033[0m' # No Color
 DOCKER_HUB_PREFIX="datfan06"
 
 # Chọn mode: local (chỉ build), minikube (build và load), docker-hub (build và push)
-MODE=${1:-"docker-hub"}  # default mode is minikube
+MODE=${1:-"docker-hub"}
+# Lấy Git SHA từ đối số thứ hai, fallback về short HEAD hoặc "latest"
+GIT_SHA_TAG=${2:-$(git rev-parse --short HEAD 2>/dev/null || echo "latest")}
 
-echo -e "${GREEN}Building images in $MODE mode...${NC}"
+echo -e "${GREEN}Building images in $MODE mode with tag: $GIT_SHA_TAG ${NC}"
 
 # Danh sách các service cần build bằng Maven
 MAVEN_SERVICES=(
@@ -62,29 +64,36 @@ for service_info in "${SERVICES[@]}"; do
     # Phân tách thông tin: thư_mục:tên_image:jar_file
     IFS=':' read -r directory image_name jar_file <<< "$service_info"
     
-    echo -e "${YELLOW}Building Docker image for $image_name...${NC}"
+    # Tạo tên image đầy đủ trên Docker Hub
+    HUB_IMAGE_NAME="$DOCKER_HUB_PREFIX/$image_name"
+
+    echo -e "${YELLOW}Building Docker image $HUB_IMAGE_NAME:$GIT_SHA_TAG ...${NC}"
     
-    # Build Docker image
+    # Build Docker image với tag SHA
     if [ -n "$jar_file" ]; then
-        # Nếu có JAR file, thêm build-arg
-        docker build -t $image_name:latest ./$directory -f ./$directory/Dockerfile --build-arg JAR_FILE=$jar_file
+        docker build -t "$HUB_IMAGE_NAME:$GIT_SHA_TAG" ./$directory -f ./$directory/Dockerfile --build-arg JAR_FILE=$jar_file
     else
-        # Nếu không có JAR file
-        docker build -t $image_name:latest ./$directory -f ./$directory/Dockerfile
+        docker build -t "$HUB_IMAGE_NAME:$GIT_SHA_TAG" ./$directory -f ./$directory/Dockerfile
     fi
+
+    # Build và tag "latest" nếu muốn (tùy chọn)
+    echo -e "${YELLOW}Tagging $HUB_IMAGE_NAME:$GIT_SHA_TAG as $HUB_IMAGE_NAME:latest ...${NC}"
+    docker tag "$HUB_IMAGE_NAME:$GIT_SHA_TAG" "$HUB_IMAGE_NAME:latest"
     
     # Xử lý theo mode
     if [ "$MODE" == "minikube" ]; then
-        echo -e "${YELLOW}Loading $image_name into minikube...${NC}"
-        minikube image load $image_name:latest
+        echo -e "${YELLOW}Loading $HUB_IMAGE_NAME:$GIT_SHA_TAG into minikube...${NC}"
+        minikube image load "$HUB_IMAGE_NAME:$GIT_SHA_TAG"
+        echo -e "${YELLOW}Loading $HUB_IMAGE_NAME:latest into minikube...${NC}"
+        minikube image load "$HUB_IMAGE_NAME:latest"
     elif [ "$MODE" == "docker-hub" ]; then
-        # Tag với prefix Docker Hub
-        docker tag $image_name:latest $DOCKER_HUB_PREFIX/$image_name:latest
-        echo -e "${YELLOW}Pushing $DOCKER_HUB_PREFIX/$image_name to Docker Hub...${NC}"
-        docker push $DOCKER_HUB_PREFIX/$image_name:latest
+        echo -e "${YELLOW}Pushing $HUB_IMAGE_NAME:$GIT_SHA_TAG to Docker Hub...${NC}"
+        docker push "$HUB_IMAGE_NAME:$GIT_SHA_TAG"
+        echo -e "${YELLOW}Pushing $HUB_IMAGE_NAME:latest to Docker Hub...${NC}"
+        docker push "$HUB_IMAGE_NAME:latest" # Push cả tag latest nếu muốn
     fi
     
     echo -e "${GREEN}Successfully processed $image_name${NC}"
 done
 
-echo -e "${GREEN}All services have been built and processed successfully in $MODE mode!${NC}" 
+echo -e "${GREEN}All services have been built and processed successfully in $MODE mode with tag $GIT_SHA_TAG!${NC}" 

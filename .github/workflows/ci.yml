@@ -34,5 +34,5 @@ jobs:
       - name: Run build_and_push.sh
         run: |
           chmod +x build_and_push.sh
-          ./build_and_push.sh docker-hub
+          ./build_and_push.sh docker-hub ${{ github.sha }}
         shell: bash 
