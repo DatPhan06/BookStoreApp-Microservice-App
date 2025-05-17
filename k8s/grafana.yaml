@@ -45,15 +45,6 @@ spec:
         volumeMounts:
         - name: grafana-storage
           mountPath: /var/lib/grafana
-        - name: services-dashboard-vol
-          mountPath: /tmp/dashboards-source/services-dashboard.json
-          subPath: services-dashboard.json
-        - name: docker-all-dashboard-vol
-          mountPath: /tmp/dashboards-source/docker-all-dashboard.json
-          subPath: docker-all-dashboard.json
-        - name: docker-container-dashboard-vol
-          mountPath: /tmp/dashboards-source/docker-container-dashboard.json
-          subPath: docker-container-dashboard.json
       containers:
       - name: grafana
         image: datfan06/graphana:latest
@@ -69,30 +60,10 @@ spec:
         volumeMounts:
         - name: grafana-storage
           mountPath: /var/lib/grafana
-        - name: dashboard-config
-          mountPath: /etc/grafana/provisioning/dashboards
-        - name: datasource-config
-          mountPath: /etc/grafana/provisioning/datasources
       volumes:
       - name: grafana-storage
         persistentVolumeClaim:
           claimName: grafana-pvc
-      - name: dashboard-config
-        configMap:
-          name: grafana-dashboard-config
-      - name: datasource-config
-        configMap:
-          name: grafana-datasource-config
-      - name: services-dashboard-vol
-        configMap:
-          name: grafana-services-dashboard
-      - name: docker-all-dashboard-vol
-        configMap:
-          name: grafana-docker-all-dashboard
-      - name: docker-container-dashboard-vol
-        configMap:
-          name: grafana-docker-container-dashboard
-
 ---
 apiVersion: v1
 kind: Service
