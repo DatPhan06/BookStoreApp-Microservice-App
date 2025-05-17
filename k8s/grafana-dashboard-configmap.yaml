@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-config # This name must match the Grafana deployment's volume
+  namespace: bookstore
+  labels:
+    grafana_dashboard: "1" # Label to help identify this as a dashboard CM
+data:
+  dashboard-provider.yaml: | # The filename here (dashboard-provider.yaml) will be created in /etc/grafana/provisioning/dashboards/
+    apiVersion: 1
+    providers:
+      - name: 'Bookstore'
+        orgId: 1
+        folder: ''
+        folderUid: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        updateIntervalSeconds: 10
+        options:
+          path: /var/lib/grafana/dashboards # This is where Grafana will look for dashboard JSON files
+          # This path (/var/lib/grafana/dashboards) is populated by the initContainer
+          # and is on the grafana-storage PVC. 

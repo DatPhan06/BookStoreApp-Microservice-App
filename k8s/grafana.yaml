@@ -34,13 +34,26 @@ spec:
             echo "Creating dashboards directory..."
             mkdir -p /var/lib/grafana/dashboards
             echo "Copying dashboards from /tmp/dashboards-source..."
-            cp /tmp/dashboards-source/*.json /var/lib/grafana/dashboards/ || echo "No dashboards found in /tmp/dashboards-source or copy failed"
+            if [ -d "/tmp/dashboards-source" ] && [ -n "$(ls -A /tmp/dashboards-source)" ]; then
+              cp /tmp/dashboards-source/*.json /var/lib/grafana/dashboards/
+            else
+              echo "No dashboards found in /tmp/dashboards-source or directory does not exist."
+            fi
             echo "Setting permissions..."
             chmod -R 777 /var/lib/grafana/
             echo "Init container finished."
         volumeMounts:
         - name: grafana-storage
           mountPath: /var/lib/grafana
+        - name: services-dashboard-vol
+          mountPath: /tmp/dashboards-source/services-dashboard.json
+          subPath: services-dashboard.json
+        - name: docker-all-dashboard-vol
+          mountPath: /tmp/dashboards-source/docker-all-dashboard.json
+          subPath: docker-all-dashboard.json
+        - name: docker-container-dashboard-vol
+          mountPath: /tmp/dashboards-source/docker-container-dashboard.json
+          subPath: docker-container-dashboard.json
       containers:
       - name: grafana
         image: datfan06/graphana:latest
@@ -70,6 +83,15 @@ spec:
       - name: datasource-config
         configMap:
           name: grafana-datasource-config
+      - name: services-dashboard-vol
+        configMap:
+          name: grafana-services-dashboard
+      - name: docker-all-dashboard-vol
+        configMap:
+          name: grafana-docker-all-dashboard
+      - name: docker-container-dashboard-vol
+        configMap:
+          name: grafana-docker-container-dashboard
 
 ---
 apiVersion: v1
