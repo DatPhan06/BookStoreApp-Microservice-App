@@ -18,6 +18,7 @@ spec:
       containers:
       - name: frontend
         image: datfan06/bookstore-frontend-react-app:latest # Replace with your actual image name/path if different
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         resources:

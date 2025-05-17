@@ -1,3 +1,3 @@
-export const BACKEND_API_GATEWAY_URL = 'http://34.126.92.242:30003';
+export const BACKEND_API_GATEWAY_URL = 'https://bookstoredlk.store/';
 export const APP_CLIENT_ID = '93ed453e-b7ac-4192-a6d4-c45fae0d99ac';
 export const APP_CLIENT_SECRET = 'client.devd123';
