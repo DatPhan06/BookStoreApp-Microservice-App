@@ -243,3 +243,5 @@ curl -u 93ed453e-b7ac-4192-a6d4-c45fae0d99ac:client.devd123 http://localhost:400
 ```
 
 *Lưu ý: Khi chạy trên Kubernetes, bạn cần thay `localhost:4001` bằng endpoint phù hợp (ví dụ: qua API Gateway `http://<WORKER_NODE_IP>:30003/account/oauth/token` - cần kiểm tra lại cấu hình route của Zuul).*
+
+## Test CI
