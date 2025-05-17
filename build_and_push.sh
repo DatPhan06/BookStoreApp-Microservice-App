@@ -15,6 +15,8 @@ echo -e "${GREEN}Building images in $MODE mode...${NC}"
 
 # Danh sách các service cần build bằng Maven
 MAVEN_SERVICES=(
+    "bookstore-commons"
+    "bookstore-feign"
     "bookstore-account-service"
     "bookstore-billing-service"
     "bookstore-catalog-service"
