@@ -23,6 +23,7 @@ MAVEN_SERVICES=(
     "bookstore-order-service"
     "bookstore-payment-service"
     "bookstore-api-gateway-service"
+    "bookstore-eureka-discovery-service"
 )
 
 # Build các Maven service
@@ -47,6 +48,7 @@ SERVICES=(
     "bookstore-order-service:bookstore-order-service:bookstore-order-service-0.0.1-SNAPSHOT.jar"
     "bookstore-payment-service:bookstore-payment-service:bookstore-payment-service-0.0.1-SNAPSHOT.jar"
     "bookstore-api-gateway-service:bookstore-zuul-api-gateway-server:bookstore-api-gateway-service-0.0.1-SNAPSHOT.jar"
+    "bookstore-eureka-discovery-service:bookstore-eureka-discovery-service:bookstore-eureka-discovery-service-0.0.1-SNAPSHOT.jar"
     
     # Các service không cần build Maven (chỉ có Dockerfile)
     "bookstore-prometheus:bookstore-prometheus:"

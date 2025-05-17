@@ -4,6 +4,7 @@ kubectl apply -f k8s/namespace.yaml
 # Deploy all services
 kubectl apply -f k8s/mysql.yaml
 kubectl apply -f k8s/consul.yaml
+kubectl apply -f k8s/eureka.yaml
 kubectl apply -f k8s/zuul-gateway.yaml
 kubectl apply -f k8s/account-service.yaml
 kubectl apply -f k8s/billing-service.yaml
