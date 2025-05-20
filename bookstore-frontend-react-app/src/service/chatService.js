@@ -1,7 +1,7 @@
-import axios from 'axios';
+import Together from 'together-ai';
 
 const TOGETHER_API_KEY = "229e72c7c655e4addddb02d6279d3b51e030e52b845d7b4d3a8c417ee05581e4";
-const TOGETHER_API_URL = 'https://api.together.xyz/v1/chat/completions';
+const together = new Together({ apiKey: TOGETHER_API_KEY });
 
 export const getChatResponse = async (messages, booksContext = []) => {
   try {
@@ -55,7 +55,7 @@ Your primary goal is to help users find books from our current inventory that ma
       }))
     ];
 
-    const requestBody = {
+    const completion = await together.chat.completions.create({
       model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
       messages: formattedMessages,
       temperature: 0.7,
@@ -63,43 +63,11 @@ Your primary goal is to help users find books from our current inventory that ma
       top_p: 0.9,
       frequency_penalty: 0.1,
       presence_penalty: 0.1
-    };
-
-    console.log('Request to TogetherAI:', {
-      url: TOGETHER_API_URL,
-      headers: {
-        'Authorization': 'Bearer ' + TOGETHER_API_KEY?.substring(0, 10) + '...',
-        'Content-Type': 'application/json'
-      },
-      body: requestBody
     });
 
-    const response = await axios.post(
-      TOGETHER_API_URL,
-      requestBody,
-      {
-        headers: {
-          'Authorization': `Bearer ${TOGETHER_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    return response.data.choices[0].message.content;
+    return completion.choices[0].message.content;
   } catch (error) {
-    console.error('Error calling TogetherAI:', {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        headers: {
-          ...error.config?.headers,
-          'Authorization': error.config?.headers?.Authorization ? 'Bearer ' + TOGETHER_API_KEY?.substring(0, 10) + '...' : undefined
-        }
-      }
-    });
+    console.error('Error calling TogetherAI:', error);
     throw error;
   }
 }; 
