@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const TOGETHER_API_KEY = process.env.REACT_APP_TOGETHER_API_KEY;
+const TOGETHER_API_KEY = "229e72c7c655e4addddb02d6279d3b51e030e52b845d7b4d3a8c417ee05581e4";
 const TOGETHER_API_URL = 'https://api.together.xyz/v1/chat/completions';
 
 export const getChatResponse = async (messages, booksContext = []) => {

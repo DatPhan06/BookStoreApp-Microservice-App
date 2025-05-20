@@ -12,6 +12,21 @@
 
 ---
 
+## 🤖 AI Chatbot hỗ trợ khách hàng
+
+Dự án tích hợp **AI Chatbot** thông minh giúp khách hàng tìm kiếm và gợi ý sách phù hợp dựa trên kho sách hiện có. Chatbot sử dụng nền tảng TogetherAI (Llama 3) với các tính năng nổi bật:
+
+- **Gợi ý sách theo sở thích, từ khóa, thể loại, đánh giá, v.v.**
+- **Đa ngôn ngữ:** Chatbot có thể trả lời bằng tiếng Việt, tiếng Anh hoặc ngôn ngữ mà người dùng sử dụng.
+- **Chỉ gợi ý sách có trong kho:** Đảm bảo các đề xuất đều dựa trên dữ liệu thực tế của cửa hàng.
+- **Tích hợp đánh giá, nhận xét khách hàng:** Chatbot sử dụng thông tin đánh giá và nhận xét để tư vấn chi tiết hơn.
+- **Phản hồi nhanh, thân thiện, chuyên nghiệp.**
+- **Không "bịa" sách không có trong kho.**
+
+> **Lưu ý:** API AI Chatbot sử dụng TogetherAI, có thể cần cấu hình biến môi trường `REACT_APP_TOGETHER_API_KEY` trong frontend.
+
+---
+
 ## 🏛️ Kiến trúc hệ thống
 
 ![Kiến trúc AWS (Minh họa)](https://user-images.githubusercontent.com/14878408/65784998-000e4500-e171-11e9-96d7-b7c199e74c4c.jpg)
