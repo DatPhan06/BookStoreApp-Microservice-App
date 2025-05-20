@@ -27,7 +27,7 @@ metadata:
   name: bookstore-mysql-db
   namespace: bookstore
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: bookstore-mysql-db
