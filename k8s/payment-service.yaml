@@ -4,7 +4,7 @@ metadata:
   name: bookstore-payment-service
   namespace: bookstore
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: bookstore-payment-service
