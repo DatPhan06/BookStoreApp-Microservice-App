@@ -16,6 +16,9 @@ FROM nginx:alpine
 # The default build output directory for Create React App is 'build'
 COPY --from=build /app/build /usr/share/nginx/html
 
+COPY .env /usr/share/nginx/html/.env
+
+
 # Expose port 80 (Nginx default port)
 EXPOSE 80
 
