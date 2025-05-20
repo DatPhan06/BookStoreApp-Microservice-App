@@ -1,14 +1,12 @@
-import Together from 'together-ai';
+import { GoogleGenAI } from "@google/genai";
 
-const TOGETHER_API_KEY = "229e72c7c655e4addddb02d6279d3b51e030e52b845d7b4d3a8c417ee05581e4";
-const together = new Together({ apiKey: TOGETHER_API_KEY });
+const GEMINI_API_KEY = "AIzaSyDy2rfcehMxGfFyDA7mmQAupcD-rKUjPvc"; // Thay bằng API key thực tế hoặc lấy từ biến môi trường
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 export const getChatResponse = async (messages, booksContext = []) => {
   try {
-    // Create system message with books context
-    const systemMessage = {
-      role: 'system',
-      content: `You are a multilingual book recommendation assistant for our online bookstore. You MUST ONLY recommend books that are currently in our inventory. Here is our complete inventory:
+    // Tạo system message với books context
+    const systemMessage = `You are a multilingual book recommendation assistant for our online bookstore. You MUST ONLY recommend books that are currently in our inventory. Here is our complete inventory:
 
 ${booksContext.map(book => `
 Book Details:
@@ -43,31 +41,19 @@ IMPORTANT RULES:
 15. Use customer reviews to provide more detailed recommendations
 16. When discussing a book, mention relevant customer reviews that highlight its strengths
 
-Your primary goal is to help users find books from our current inventory that match their interests and needs, while communicating in their preferred language.`
-    };
+Your primary goal is to help users find books from our current inventory that match their interests and needs, while communicating in their preferred language.`;
 
-    // Format messages for TogetherAI
-    const formattedMessages = [
-      systemMessage,
-      ...messages.map(msg => ({
-        role: msg.sender === 'BookBot' ? 'assistant' : 'user',
-        content: msg.text
-      }))
-    ];
+    // Gộp system message và các message user gửi
+    const userMessages = messages.map(msg => msg.text).join('\n');
+    const prompt = `${systemMessage}\n\nUser: ${userMessages}`;
 
-    const completion = await together.chat.completions.create({
-      model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
-      messages: formattedMessages,
-      temperature: 0.7,
-      max_tokens: 1000,
-      top_p: 0.9,
-      frequency_penalty: 0.1,
-      presence_penalty: 0.1
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
     });
-
-    return completion.choices[0].message.content;
+    return response.text;
   } catch (error) {
-    console.error('Error calling TogetherAI:', error);
+    console.error("Error calling Gemini AI:", error);
     throw error;
   }
 }; 
