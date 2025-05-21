@@ -29,8 +29,9 @@ Dự án tích hợp **AI Chatbot** thông minh giúp khách hàng tìm kiếm v
 
 ## 🏛️ Kiến trúc hệ thống
 
-![Kiến trúc AWS (Minh họa)](https://user-images.githubusercontent.com/14878408/65784998-000e4500-e171-11e9-96d7-b7c199e74c4c.jpg)
-*(Lưu ý: Sơ đồ này minh họa kiến trúc triển khai dự kiến trên AWS. Kiến trúc hiện tại đang chạy trên Kubernetes)*
+<!-- ![Kiến trúc AWS (Minh họa)](https://user-images.githubusercontent.com/14878408/65784998-000e4500-e171-11e9-96d7-b7c199e74c4c.jpg)
+*(Lưu ý: Sơ đồ này minh họa kiến trúc triển khai dự kiến trên AWS. Kiến trúc hiện tại đang chạy trên Kubernetes)* -->
+![Kiến trúc hệ thống](images/KienTruc.png)
 
 *   **Microservices:** Các dịch vụ lõi (Account, Billing, Catalog, Order, Payment) được xây dựng bằng Spring Boot.
 *   **API Gateway:** `bookstore-zuul-api-gateway-server` (Zuul) đóng vai trò là cổng vào duy nhất cho các yêu cầu từ client. Nó định tuyến yêu cầu đến các microservice phù hợp.
